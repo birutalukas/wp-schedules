@@ -1,0 +1,393 @@
+.bs-search-wrapper {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+.bs-search-column {
+    display: flex;
+    gap: 1rem;
+    width: 66.666%;
+}
+.bs-date-column {
+    display: flex;
+    gap: 1rem;
+    width: 33.333%;
+}
+.bs-cta-wrapper {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 4.25rem;
+    margin-bottom: 1.75rem;
+    border-bottom: 2px solid #ebebeb;
+}
+.bs-search-wrapper input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.bs-search-dropdown-content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 1rem);
+    border-radius: 1rem;
+    border: 0.0625rem solid #818b89;
+    background-color: white;
+    padding: 0.5rem 0;
+    max-height: 300px;
+    overflow-y: scroll;
+}
+
+.bs-search-dropdown-content ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+.bs-search-dropdown-content ul li {
+    font-size: 1rem;
+    line-height: 1.375rem;
+    font-weight: 400;
+    color: #818b89;
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+}
+.bs-input-wrapper {
+    position: relative;
+    flex: 1;
+}
+.bs-label {
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.375rem;
+    font-weight: 700;
+    color: #222e2b;
+    margin-bottom: 0.5rem;
+    display: block;
+    cursor: pointer;
+}
+.bs-input {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 2rem;
+    border: 0.0625rem solid #818b89;
+    height: 2.75rem;
+    font-size: 1rem;
+    line-height: 1.375rem;
+    font-weight: 400;
+    font-family: inherit;
+    color: #818b89;
+}
+.bs-input--icon-wrapper {
+    position: relative;
+    box-sizing: border-box;
+}
+.bs-input--icon-wrapper svg {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.bs-input--icon__input-el {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    padding-left: 2.5rem;
+    border-radius: 2rem;
+    border: none;
+    outline: none;
+    background-color: transparent;
+    font-size: 1rem;
+    line-height: 1.375rem;
+    font-weight: 400;
+    color: #818b89;
+    font-family: inherit;
+}
+.bs-results-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 2rem;
+}
+.bs-results-wrapper .bs-results-title {
+    margin-top: 0;
+    margin-bottom: 4rem;
+}
+.bs-results-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border: 2px solid #a1be95;
+    border-radius: 1.25rem;
+    background-color: white;
+    margin-bottom: 2rem;
+}
+.bs-results-item:last-child {
+    margin-bottom: 0;
+}
+.bs-results-item--left {
+    height: 100%;
+    min-width: 10rem;
+    border-right: 1px solid #a1be95;
+}
+.bs-results-item--left h3 .bs-time {
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+    font-weight: 600;
+    color: #222e2b;
+    margin: 0;
+}
+.bs-results-item--left span {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 400;
+    color: #818b89;
+}
+.bs-results-item--middle {
+    padding-left: 3rem;
+    flex: 1;
+}
+.bs-results-item--middle .route-title {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 400;
+    color: #222e2b;
+    margin: 0;
+}
+.bs-results-item--right {
+}
+.bs-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 2.5rem;
+    font-size: 20px;
+    line-height: 1.75rem;
+    font-weight: 400;
+    color: white;
+    background-color: #a1be95;
+    border-radius: 3.125rem;
+    height: 3.25rem;
+    outline: none;
+    border: none;
+    cursor: pointer;
+}
+.bs-button:disabled {
+    cursor: not-allowed;
+}
+.bs-modal-wrapper {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+.bs-modal-overlay {
+    background-color: #222e2b;
+    backdrop-filter: blur(20px);
+    opacity: 0.8;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+}
+.bs-button-icon {
+    width: 2rem;
+    height: 2rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    z-index: 999;
+}
+.bs-modal-content {
+    display: flex;
+    border-radius: 1.25rem;
+    overflow: hidden;
+    width: 70%;
+    position: relative;
+    z-index: 99999;
+    background-color: white;
+    max-height: 90vh;
+}
+.bs-modal-content--left {
+    width: 50%;
+    height: 100%;
+    z-index: 10;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+.bs-modal-content--left::-webkit-scrollbar {
+    display: none;
+}
+.bs-modal-content--right {
+    width: 50%;
+    position: relative;
+}
+.bs-modal-head {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #7a946f;
+}
+.bs-modal-title {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 400;
+
+    margin: 0;
+}
+.bs-route-schedule {
+    padding-top: 1.25rem;
+    padding-bottom: 0.75rem;
+}
+.bs-route-schedule-item {
+    display: flex;
+    align-items: center;
+}
+.bs-route-schedule-item--left {
+    width: 3rem;
+    min-width: 3rem;
+    max-width: 3rem;
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin-right: 1.5rem;
+}
+.bs-route-schedule-item--left::before {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    content: "";
+    width: 1px;
+    background-color: #b2c6b6;
+    z-index: 10;
+}
+.bs-route-schedule-item__dot--small {
+    width: 1rem;
+    height: 1rem;
+    background-color: #b2c6b6;
+    border-radius: 50%;
+}
+.bs-route-schedule-item__dot--large {
+    width: 100%;
+    height: 100%;
+    background-color: #b2c6b6;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    pointer-events: none;
+}
+.bs-user-choice {
+    border: 1px solid black;
+}
+.bs-route-schedule-time {
+    font-size: 1rem;
+    line-height: 1.375rem;
+    font-weight: 700;
+    min-width: 3rem;
+    margin-right: 1rem;
+    color: #222e2b;
+}
+.bs-route-schedule-stop {
+    font-size: 1rem;
+    line-height: 1.375rem;
+    font-weight: 400;
+    color: #222e2b;
+}
+.bs-route-map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.leaflet-control-attribution {
+    display: none !important;
+}
+.flatpickr-calendar {
+    box-shadow: none;
+    border: 0.0625rem solid #818b89;
+}
+.flatpickr-day.selected,
+.flatpickr-day.selected:focus,
+.flatpickr-day.selected:hover,
+.flatpickr-day.selected.nextMonthDay {
+    background-color: #a1be96;
+    border-color: #a1be96;
+    color: #fff;
+}
+.flatpickr-day.today {
+    border-color: #a1be96;
+}
+.flatpickr-day:hover {
+    border-color: #ebebeb;
+}
+.flatpickr-months .flatpickr-prev-month:hover svg,
+.flatpickr-months .flatpickr-next-month:hover svg {
+    fill: #a1be96;
+}
+.flatpickr-current-month {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.numInputWrapper {
+    order: -1;
+}
+.flatpickr-time .numInput {
+    background-color: transparent;
+    font-size: 1rem;
+    line-height: 1.375rem;
+    font-weight: 400;
+    color: #818b89;
+    font-family: inherit;
+    width: 2.5rem;
+}
+
+.flatpickr-time input.flatpickr-hour {
+    font-weight: normal;
+}
+.numInputWrapper:hover,
+.flatpickr-time input:hover,
+.flatpickr-time .flatpickr-am-pm:hover,
+.flatpickr-time input:focus,
+.flatpickr-time .flatpickr-am-pm:focus {
+    background-color: transparent !important;
+    background: transparent !important;
+}
+.flatpickr-calendar.hasTime.noCalendar {
+    border-radius: 2rem;
+    overflow: hidden;
+    box-shadow: none;
+    border: none;
+    background-color: transparent;
+    width: unset;
+    position: absolute;
+    left: 2rem;
+    top: 0;
+    bottom: 0;
+}
+.flatpickr-calendar.hasTime .flatpickr-time {
+    border-top: none;
+}
+.flatpickr-time-separator {
+    order: -1;
+}
+.flatpickr-day.nextMonthDay {
+    color: #a1be96;
+}
