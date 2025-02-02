@@ -10,7 +10,6 @@ document.addEventListener("alpine:init", () => {
         startObj: {},
         endObj: {},
         filteredRoutes: [],
-        notFoundMessage: "",
         startQuery: "",
         endQuery: "",
         selectedDate: "",
@@ -21,6 +20,7 @@ document.addEventListener("alpine:init", () => {
         showEndDropdown: false,
         isModalOpen: false,
         modalData: {},
+        searchInitialized: false,
         openModal(route) {
             this.modalData = route;
             this.isModalOpen = true;
@@ -65,6 +65,7 @@ document.addEventListener("alpine:init", () => {
                 disableMobile: "true",
                 onChange: (date, dateString) => {
                     this.selectedDate = dateString;
+                    this.searchInitialized = false;
                 },
             });
 
@@ -78,6 +79,7 @@ document.addEventListener("alpine:init", () => {
 
                 onChange: (time, timeString) => {
                     this.selectedTime = timeString;
+                    this.searchInitialized = false;
                 },
             });
         },
@@ -88,6 +90,7 @@ document.addEventListener("alpine:init", () => {
                 return;
             }
 
+            this.searchInitialized = true;
             // Map for translating driving days
             const daysMapping = {
                 Pirmadienis: 1,
@@ -170,18 +173,6 @@ document.addEventListener("alpine:init", () => {
                     }));
             });
 
-            if (
-                this.startObj.id &&
-                this.endObj.id &&
-                this.selectedDate &&
-                this.selectedTime &&
-                result.length === 0
-            ) {
-                this.notFoundMessage =
-                    "Nėra maršrutų, atitinkančių pasirinktus kriterijus.";
-            } else {
-                this.notFoundMessage = "";
-            }
             return result;
         },
 
@@ -246,6 +237,27 @@ document.addEventListener("alpine:init", () => {
             setTimeout(() => {
                 if (type === "start") this.showStartDropdown = false;
                 if (type === "end") this.showEndDropdown = false;
+            }, 200); // Delay for click to register
+        },
+        showDropdown(type) {
+            setTimeout(() => {
+                if (type === "start") {
+                    if (this.startQuery.length >= 2) {
+                        this.showStartDropdown = true;
+                    } else {
+                        this.showStartDropdown = false;
+                    }
+                    this.searchInitialized = false;
+                }
+
+                if (type === "end") {
+                    if (this.endQuery.length >= 2) {
+                        this.showEndDropdown = true;
+                    } else {
+                        this.showEndDropdown = false;
+                    }
+                    this.searchInitialized = false;
+                }
             }, 200); // Delay for click to register
         },
         initMap(route) {
@@ -316,7 +328,7 @@ document.addEventListener("alpine:init", () => {
         eldershipObj: {},
         streetObj: {},
         categories: [],
-        selectedCategory: "",
+        selectedCategory: [],
         filteredEldership: [],
         filteredAssemblies: [],
         eldershipQuery: "",
@@ -326,6 +338,7 @@ document.addEventListener("alpine:init", () => {
         isModalOpen: false,
         modalData: {},
         formattedDates: [],
+        searchInitialized: false,
 
         openModal(assemblySchedule) {
             if (!assemblySchedule || !assemblySchedule.timeline) {
@@ -344,30 +357,9 @@ document.addEventListener("alpine:init", () => {
             this.formattedDates = assemblySchedule.timeline.flatMap(
                 (timelineItem) =>
                     (timelineItem.schedules || []).flatMap((schedules) => {
-                        const monthMapping = {
-                            Sausis: "01",
-                            Vasaris: "02",
-                            Kovas: "03",
-                            Balandis: "04",
-                            Gegužė: "05",
-                            Birželis: "06",
-                            Liepa: "07",
-                            Rugpjūtis: "08",
-                            Rugsėjis: "09",
-                            Spalis: "10",
-                            Lapkritis: "11",
-                            Gruodis: "12",
-                        };
-
-                        const month = monthMapping[schedules.month];
-                        if (!month) return [];
-
-                        return schedules.days.map(
-                            (day) =>
-                                `${new Date().getFullYear()}-${month}-${String(
-                                    day
-                                ).padStart(2, "0")}`
-                        );
+                        return schedules.days.map((day) => {
+                            return day;
+                        });
                     })
             );
 
@@ -426,28 +418,46 @@ document.addEventListener("alpine:init", () => {
 
         findAssemblySchedule() {
             // Filter assemblies based on eldership and optional criteria
+
             this.filteredAssemblies = this.assemblies
                 .map((assembly) => {
-                    const filteredTimeline = assembly.timeline.filter(
-                        (timelineItem) => {
-                            const matchesEldership =
-                                this.eldershipObj?.id ===
-                                timelineItem.eldership_id;
+                    // Ensure timeline is a valid array
+                    if (
+                        !Array.isArray(assembly.timeline) ||
+                        assembly.timeline.length === 0
+                    ) {
+                        return null; // Skip assemblies without valid timelines
+                    }
+
+                    const filteredTimeline = assembly.timeline
+                        .flat() // Flatten nested arrays in case timelines contain arrays
+                        .filter((timelineItem) => {
+                            const matchesEldership = Array.isArray(
+                                timelineItem.eldership_id
+                            )
+                                ? timelineItem.eldership_id.includes(
+                                      this.eldershipObj?.id
+                                  )
+                                : this.eldershipObj?.id ===
+                                  timelineItem.eldership_id;
 
                             const matchesStreet =
                                 !this.streetObj?.id || // If no street is selected, match all
-                                timelineItem.schedule.some((scheduleItem) => {
-                                    return (
-                                        Array.isArray(scheduleItem.street_id) &&
-                                        scheduleItem.street_id.includes(
-                                            this.streetObj?.id
-                                        )
+                                timelineItem.schedule?.some((scheduleItem) => {
+                                    // Ensure street_id is an array
+                                    if (
+                                        !Array.isArray(scheduleItem.street_id)
+                                    ) {
+                                        return false; // Skip invalid street IDs
+                                    }
+
+                                    return scheduleItem.street_id.includes(
+                                        this.streetObj?.id
                                     );
                                 });
 
                             return matchesEldership && matchesStreet;
-                        }
-                    );
+                        });
 
                     // Return the assembly only if there is a matching timeline
                     return filteredTimeline.length > 0
@@ -455,6 +465,10 @@ document.addEventListener("alpine:init", () => {
                         : null;
                 })
                 .filter(Boolean); // Remove null entries
+
+            "this.filteredAssemblies", this.filteredAssemblies;
+
+            this.searchInitialized = true;
         },
 
         computedAssemblies() {
@@ -463,11 +477,12 @@ document.addEventListener("alpine:init", () => {
                 // Aggregate all timeline data into one item
                 const timelineData = assembly.timeline.map((timelineItem) => {
                     // Process schedules data
-                    const schedules = timelineItem.schedule.map((schedule) => ({
-                        month: schedule.month,
-                        days: schedule.days.map((day) => parseInt(day, 10)), // Convert days to numbers
-                        streetID: schedule.street_id,
-                    }));
+                    const schedules = timelineItem.schedule.map((schedule) => {
+                        return {
+                            days: schedule.days.map((day) => day), // Convert days to numbers
+                            streetID: schedule.street_id,
+                        };
+                    });
 
                     // Filter schedules by streetID if applicable
                     const filteredSchedules = this.streetObj?.id
@@ -497,9 +512,11 @@ document.addEventListener("alpine:init", () => {
             });
 
             // Filter the result based on the selected category
-            if (this.selectedCategory) {
+            if (this.selectedCategory.length > 0) {
                 return result.filter((assembly) =>
-                    assembly.type.includes(this.selectedCategory)
+                    this.selectedCategory.some((category) =>
+                        assembly.type.includes(category)
+                    )
                 );
             }
 
@@ -525,13 +542,23 @@ document.addEventListener("alpine:init", () => {
         },
 
         get filteredStreet() {
-            return this.streetQuery === ""
+            return this.streetQuery === "" && !this.eldershipObj.id
                 ? this.streets
                 : this.streets.filter((street) => {
-                      return this.normalizeString(street.title).includes(
-                          this.normalizeString(this.streetQuery)
-                      );
+                      // Check if street matches the Eldership ID
+                      const matchesQuery = this.normalizeString(
+                          street.title
+                      ).includes(this.normalizeString(this.streetQuery));
+
+                      const matchesEldership = this.eldershipObj.id
+                          ? street.eldership_id === this.eldershipObj.id
+                          : true;
+
+                      // Return true if both conditions are met
+                      return matchesQuery && matchesEldership;
                   });
+
+            // if eldershipObj.id is set I need filter streets that has street.eldership_id
         },
 
         selectEldership(eldership) {
@@ -550,6 +577,27 @@ document.addEventListener("alpine:init", () => {
             setTimeout(() => {
                 if (type === "eldership") this.showEldershipDropdown = false;
                 if (type === "street") this.showStreetDropdown = false;
+            }, 200); // Delay for click to register
+        },
+        showDropdown(type) {
+            setTimeout(() => {
+                if (type === "eldership") {
+                    if (this.eldershipQuery.length >= 2) {
+                        this.showEldershipDropdown = true;
+                    } else {
+                        this.showEldershipDropdown = false;
+                    }
+                    this.searchInitialized = false;
+                }
+
+                if (type === "street") {
+                    if (this.streetQuery.length >= 2) {
+                        this.showStreetDropdown = true;
+                    } else {
+                        this.showStreetDropdown = false;
+                    }
+                    this.searchInitialized = false;
+                }
             }, 200); // Delay for click to register
         },
     }));

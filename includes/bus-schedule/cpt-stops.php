@@ -84,3 +84,7 @@ function bs_create_stops_terms() {
 }
 add_action('init', 'bs_create_stops_terms');
 
+add_filter('manage_edit-stoteles_sortable_columns', function($columns) {
+    $columns['taxonomy-stoteles_tipas'] = 'stoteles_tipas';
+    return $columns;
+});

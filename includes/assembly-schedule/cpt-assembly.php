@@ -44,3 +44,8 @@ function bs_register_assembly_taxonomy() {
     
 }
 add_action('init', 'bs_register_assembly_taxonomy');
+
+add_filter('manage_edit-grafikai_sortable_columns', function($columns) {
+    $columns['taxonomy-atlieku_tipas'] = 'atlieku_tipas';
+    return $columns;
+});

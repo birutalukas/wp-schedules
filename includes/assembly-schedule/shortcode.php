@@ -10,7 +10,15 @@ function assembly_schedule_shortcode( $atts ) {
 
         <div class="as-categories-wrapper">
             <template x-for="cat in categories" :key="cat.term_id">
-                <button class="as-category-button" @click="selectedCategory === cat.name ? selectedCategory = '' : selectedCategory = cat.name" :style="selectedCategory === cat.name ? 'background-color: #df7a5e;' : '';" x-text="cat.name"></button>
+                <button class="as-category-button" 
+                    @click="
+                        selectedCategory.includes(cat.name)
+                            ? selectedCategory.splice(selectedCategory.indexOf(cat.name), 1)
+                            : selectedCategory.push(cat.name)
+                    "
+                    :style="selectedCategory.includes(cat.name) ? 'background-color: #df7a5e !important; border: 1px solid black !important; color: white !important;' : '';" 
+                    x-text="cat.name">
+                </button>
             </template>
         </div>
 
@@ -23,8 +31,8 @@ function assembly_schedule_shortcode( $atts ) {
                     <label for="eldership" class="bs-label">Seniūnija</label>
                     <input
                         x-model="eldershipQuery"
-                        @input="showEldershipDropdown = true"
-                        @focus="showEldershipDropdown = true"
+                        @input="showDropdown('eldership')"
+                        @focus="showDropdown('eldership')" 
                         @blur="hideDropdown('eldership')"
                         class="bs-input"
                         placeholder="Ieškoti..."
@@ -34,7 +42,7 @@ function assembly_schedule_shortcode( $atts ) {
                     />        
                 </div>
                             
-                <div x-show="showEldershipDropdown" class="bs-search-dropdown-content">
+                <div x-show="showEldershipDropdown" x-cloak class="bs-search-dropdown-content" :class="{ 'bs-invalid' : filteredEldership?.length == 0 }">
                     <ul class="">
                         <template x-for="eldership in filteredEldership" :key="eldership.id">                                
                             <li
@@ -44,7 +52,10 @@ function assembly_schedule_shortcode( $atts ) {
                             >
                             </li>
                         </template>
-                        <li x-show="filteredEldership?.length == 0">Nerasta...</li>
+                        <li x-show="filteredEldership?.length == 0" style="color: white !important;">
+                            <strong class="bs-not-found-head">Deja, tokios seniūnijos nerandame.</strong>
+                            <span class="bs-not-found-body">Patikrinkite, ar įvedėte be klaidų...</span>
+                        </li>
                     </ul>
         
                     
@@ -59,8 +70,8 @@ function assembly_schedule_shortcode( $atts ) {
                     <label for="street" class="bs-label">Gatvė</label>                        
                     <input
                         x-model="streetQuery"
-                        @input="showStreetDropdown = true"
-                        @focus="showStreetDropdown = true"
+                        @input="showDropdown('street')"
+                        @focus="showDropdown('street')"
                         @blur="hideDropdown('street')"
                         class="bs-input"
                         placeholder="Ieškoti..."
@@ -71,7 +82,7 @@ function assembly_schedule_shortcode( $atts ) {
                 </div>
         
                 
-                <div  x-show="showStreetDropdown" class="bs-search-dropdown-content">
+                <div  x-show="showStreetDropdown" x-cloak class="bs-search-dropdown-content" :class="{ 'bs-invalid' : filteredStreet?.length == 0 }">
                     <ul class="">
                         <template x-for="street in filteredStreet" :key="street.id">
                             
@@ -82,7 +93,10 @@ function assembly_schedule_shortcode( $atts ) {
                             >
                             </li>
                         </template>
-                        <li x-show="filteredStreet?.length == 0">Nerasta...</li>
+                        <li x-show="filteredStreet?.length == 0" style="color: white !important;">
+                            <strong class="bs-not-found-head">Deja, tokios gyvenvietės nerandame.</strong>
+                            <span class="bs-not-found-body">Patikrinkite, ar įvedėte be klaidų...</span>
+                        </li>
                     </ul>                                    
                 </div>
             </div>   
@@ -94,7 +108,7 @@ function assembly_schedule_shortcode( $atts ) {
         </div>
 
         <!-- Tvarkaraštis -->
-        <template x-if="computedAssemblies().length">
+        <template x-if="searchInitialized && computedAssemblies().length">
             <div class="bs-results-wrapper">
                 <h3 class="bs-results-title">
                     Nurodytu adresu rasta viso objektų: 
@@ -142,6 +156,9 @@ function assembly_schedule_shortcode( $atts ) {
             </div>
         </template>
 
+        <template x-if="searchInitialized && computedAssemblies().length === 0">
+            <h3 class="bs-results-title">Nėra grafikų, atitinkančių pasirinktus kriterijus.</h3>
+        </template>
         <!-- Modal -->
         <div 
             x-show="isModalOpen" 

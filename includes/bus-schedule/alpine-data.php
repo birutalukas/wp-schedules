@@ -36,6 +36,7 @@ function bs_get_schedules_data() {
                 $start_point_data = [
                     'stopID'   => $schedule['start_point'],
                     'stopName' => get_the_title($schedule['start_point']),
+                    'stopNumber' => get_field('stop_number', $schedule['start_point']),
                     'stopTime' => $schedule['start_point_time'],
                     'stopLat'  => get_field('stop_lat', $schedule['start_point']),
                     'stopLang' => get_field('stop_lang', $schedule['start_point']),
@@ -44,6 +45,7 @@ function bs_get_schedules_data() {
                 $end_point_data = [
                     'stopID'   => $schedule['end_point'],
                     'stopName' => get_the_title($schedule['end_point']),
+                    'stopNumber' => get_field('stop_number', $schedule['start_point']),
                     'stopTime' => $schedule['end_point_time'],
                     'stopLat'  => get_field('stop_lat', $schedule['end_point']),
                     'stopLang' => get_field('stop_lang', $schedule['end_point']),
@@ -59,6 +61,7 @@ function bs_get_schedules_data() {
                         return [
                             'stopID'   => $stop['stop_point'],
                             'stopName' => get_the_title($stop['stop_point']),
+                            'stopNumber' => get_field('stop_number', $schedule['start_point']),
                             'stopTime' => $stop['stop_time'],
                             'stopLat'  => get_field('stop_lat', $stop['stop_point']),
                             'stopLang' => get_field('stop_lang', $stop['stop_point']),

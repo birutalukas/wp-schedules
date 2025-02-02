@@ -158,7 +158,10 @@ function bs_add_taxonomy_filters_to_admin() {
             // Jei yra terminų, sukuriame pasirinkimo laukelį
             if ($terms) {
                 echo '<select name="' . $type_slug . '" id="' . $type_slug . '" class="postform">';
-                echo '<option value="">' . 'Rodyti viską' . '</option>';
+                echo '<option value="">' . (
+                    ($type_slug === 'marsruto_tipas' ? ' Visi tipai' : '') . 
+                    ($type_slug === 'marsruto_kryptis' ? 'Visos kryptys' : '')
+                ) . '</option>';
                 foreach ($terms as $term) {
                     // Patikriname, ar terminas pasirinktas
                     $selected = (isset($_GET[$type_slug]) && $_GET[$type_slug] == $term->slug) ? ' selected="selected"' : '';
@@ -198,3 +201,94 @@ function bs_filter_posts_by_taxonomy($query) {
     }
 }
 add_action('pre_get_posts', 'bs_filter_posts_by_taxonomy');
+
+add_filter('manage_marsrutai_posts_columns', function($columns) {
+    $columns['vaziavimo_dienos'] = __('Važiavimo dienos', 'textdomain');
+    return $columns;
+});
+
+add_action('manage_marsrutai_posts_custom_column', function($column, $post_id) {
+    if ($column === 'vaziavimo_dienos') {
+        // Replace 'repeater_field' with your actual repeater field name
+        if (have_rows('schedules_repeater', $post_id)) {
+            while (have_rows('schedules_repeater', $post_id)) {
+                the_row();
+                // Replace 'select_field' with your actual select field name inside the repeater
+                $select_value = get_sub_field('schedule_timeline');
+
+                if (!empty($select_value)) {
+                    foreach ($select_value as $key => $value) {
+                        echo esc_html($value) . '<br>';
+                    }
+                    
+                }
+            }
+        } 
+    }
+}, 10, 2);
+
+
+
+add_action('restrict_manage_posts', function() {
+    global $typenow;
+
+    if ($typenow === 'marsrutai') { // Target the "marsrutai" post type
+        $selected = $_GET['vaziavimo_dienos'] ?? '';
+
+        ?>
+        <select name="vaziavimo_dienos">
+            <option value=""><?php _e('Visos važiavimo dienos', 'wp-schedules'); ?></option>
+            <option value="Pirmadienis" <?php selected($selected, 'Pirmadienis'); ?>>Pirmadienis</option>
+            <option value="Antradienis" <?php selected($selected, 'Antradienis'); ?>>Antradienis</option>
+            <option value="Trečiadienis" <?php selected($selected, 'Trečiadienis'); ?>>Trečiadienis</option>
+            <option value="Ketvirtadienis" <?php selected($selected, 'Ketvirtadienis'); ?>>Ketvirtadienis</option>
+            <option value="Penktadienis" <?php selected($selected, 'Penktadienis'); ?>>Penktadienis</option>
+            <option value="Šeštadienis" <?php selected($selected, 'Šeštadienis'); ?>>Šeštadienis</option>
+            <option value="Sekmadienis" <?php selected($selected, 'Sekmadienis'); ?>>Sekmadienis</option>
+            <option value="Darbo dienos" <?php selected($selected, 'Darbo dienos'); ?>>Darbo dienos</option>
+            <option value="Savaitgalis" <?php selected($selected, 'Savaitgalis'); ?>>Savaitgalis</option>
+        </select>
+        <?php
+    }
+});
+
+
+add_action('pre_get_posts', function($query) {
+    global $pagenow;
+
+    // Check that we are filtering for the correct post type and the filter is set
+    if (
+        is_admin() &&
+        $pagenow === 'edit.php' &&
+        isset($_GET['post_type']) &&
+        $_GET['post_type'] === 'marsrutai' &&
+        !empty($_GET['vaziavimo_dienos'])
+    ) {
+        $selected_day = sanitize_text_field($_GET['vaziavimo_dienos']);
+        
+        // Check if it's an array (e.g., multiple selections from ACF multi-select field)
+        if (is_array($selected_day)) {
+            $selected_day = implode(',', $selected_day); // Convert array to a string
+        }
+
+        // Now build the query
+        $meta_query = [
+            [
+                'key'     => 'schedules_repeater_0_schedule_timeline',
+                'value'   => $selected_day,
+                'compare' => 'LIKE',
+            ],
+        ];
+
+        $query->set('meta_query', $meta_query);
+    }
+}, 20);
+
+
+
+add_filter('manage_edit-marsrutai_sortable_columns', function($columns) {
+    $columns['vaziavimo_dienos'] = 'vaziavimo_dienos';
+    $columns['taxonomy-marsruto_tipas'] = 'marsruto_tipas';
+    $columns['taxonomy-marsruto_kryptis'] = 'marsruto_kryptis';
+    return $columns;
+});

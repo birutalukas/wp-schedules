@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Tvarkaraščiai
  * Description: Autobusų reisų ir Šiukšlių išvežimo grafikų sistema su stotelių ir laiko paieška. Shortcode panaudojimas: <strong>Miesto autobusai: </strong>[bus_schedules type="city_routes"]. <strong>Tarpmiestiniai autobusai: </strong>[bus_schedules type="intercity_routes"]. <strong>Šiukšlių išvežimo grafikai: </strong> [assembly_schedules].
- * Version: 1.1
+ * Version: 1.3
  * Author: Lukas Biruta
  * Author URI: https://biruta.lt
  */

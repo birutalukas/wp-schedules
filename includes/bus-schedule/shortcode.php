@@ -18,8 +18,8 @@ function bus_schedule_shortcode( $atts ) {
                         <label for="start-stop" class="bs-label">Važiuosiu iš</label>
                         <input
                             x-model="startQuery"
-                            @input="showStartDropdown = true"
-                            @focus="showStartDropdown = true"
+                            @input="showDropdown('start')"
+                            @focus="showDropdown('start')"
                             @blur="hideDropdown('start')"
                             class="bs-input"
                             placeholder="Ieškoti..."
@@ -30,7 +30,7 @@ function bus_schedule_shortcode( $atts ) {
                     </div>
             
                     <!-- Combobox Options -->
-                    <div x-cloak x-show="showStartDropdown" class="bs-search-dropdown-content">
+                    <div x-cloak x-show="showStartDropdown" class="bs-search-dropdown-content" :class="{ 'bs-invalid' : filteredStart.length == 0 }" >
                         <ul class="">
                             <template x-for="stop in filteredStart" :key="stop.id">
                                 <!-- Combobox Option -->
@@ -41,7 +41,10 @@ function bus_schedule_shortcode( $atts ) {
                                 >
                                 </li>
                             </template>
-                            <li x-show="filteredStart.length == 0">Nerasta...</li>
+                            <li x-show="filteredStart.length == 0" style="color: white !important;">
+                                <strong class="bs-not-found-head">Deja, tokios išvykimo vietos nerandame.</strong>
+                                <span class="bs-not-found-body">Patikrinkite, ar įvedėte be klaidų...</span>
+                            </li>
                         </ul>
             
                         
@@ -56,8 +59,8 @@ function bus_schedule_shortcode( $atts ) {
                         <label for="end-stop" class="bs-label">Važiuosiu į</label>                        
                         <input
                             x-model="endQuery"
-                            @input="showEndDropdown = true"
-                            @focus="showEndDropdown = true"
+                            @input="showDropdown('end')"
+                            @focus="showDropdown('end')"
                             @blur="hideDropdown('end')"
                             class="bs-input"
                             placeholder="Ieškoti..."
@@ -68,7 +71,7 @@ function bus_schedule_shortcode( $atts ) {
                     </div>
             
                     <!-- Combobox Options -->
-                    <div x-cloak x-show="showEndDropdown" class="bs-search-dropdown-content">
+                    <div x-cloak x-show="showEndDropdown" class="bs-search-dropdown-content" :class="{ 'bs-invalid' : filteredEnd.length == 0 }">
                         <ul class="">
                             <template x-for="stop in filteredEnd" :key="stop.id">
                                 <!-- Combobox Option -->
@@ -79,7 +82,10 @@ function bus_schedule_shortcode( $atts ) {
                                 >
                                 </li>
                             </template>
-                            <li x-show="filteredEnd.length == 0">Nerasta...</li>
+                            <li x-show="filteredEnd.length == 0" style="color: white !important;">
+                                <strong class="bs-not-found-head">Deja, tokios atvykimo vietos nerandame.</strong>
+                                <span class="bs-not-found-body">Patikrinkite, ar įvedėte be klaidų...</span>
+                            </li>
                         </ul>
             
                         
@@ -136,7 +142,7 @@ function bus_schedule_shortcode( $atts ) {
         </div>
 
         <!-- Tvarkaraštis -->
-        <template x-if="computedRoutes().length">
+        <template x-if="searchInitialized && computedRoutes().length">
             <div class="bs-results-wrapper">  
                 
                 <h3 class="bs-results-title">Maršrutai</h3>
@@ -165,8 +171,8 @@ function bus_schedule_shortcode( $atts ) {
             </div>
         </template>
 
-        <template x-if="notFoundMessage">
-            <p x-text="notFoundMessage"></p>
+        <template x-if="searchInitialized && computedRoutes().length === 0">
+            <h3 class="bs-results-title">Nėra maršrutų, atitinkančių pasirinktus kriterijus.</h3>
         </template>
 
         <!-- Modal -->
